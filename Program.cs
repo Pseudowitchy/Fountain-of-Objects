@@ -356,10 +356,7 @@ interface ISenses
 class LightSense : ISenses
 {
     public bool CanSense(Game game) => game.Map.CurrentRoom(game.Player.Position) == Room.Start;
-    public void DisplaySense(Game game)
-    {
-        ConsoleColorUpdate.WriteLine("You can see light in this room! You must be at the entrance.", ConsoleColor.Yellow);
-    }
+    public void DisplaySense(Game game) => ConsoleColorUpdate.WriteLine("You can see light in this room! You must be at the entrance.", ConsoleColor.Yellow); 
 }
 
 class FountainSense : ISenses
