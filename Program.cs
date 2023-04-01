@@ -34,7 +34,7 @@ static Game CreateSmallGame()
     Enemies[] enemies = new Enemies[]
     {
         new Maelstrom(new Position(2, 2)),
-        new Amarok(new Position(3, 3))
+        new Amarok(new Position(1, 3))
     };
     return new Game(map, new Player(start), enemies);
 }
