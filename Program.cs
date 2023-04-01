@@ -83,7 +83,7 @@ static Game CreateLargeGame()
 
 class Game
 {
-    public Player? Player { get; }
+    public Player Player { get; }
     public Map Map { get; }
     public Enemies[] Enemies { get; }
     public bool FountainEnabled { get; set; }
@@ -106,7 +106,7 @@ class Game
 
     public void Play() 
     {
-        while (!Player!.IsDead && !Victory)
+        while (!Player.IsDead && !Victory)
         {
             DisplayUpdate();
             ICommands command = Command();
@@ -132,7 +132,7 @@ class Game
     private void DisplayUpdate()
     {
         ConsoleColorUpdate.WriteLine("----------------------------------------------------------------------------------", ConsoleColor.White);
-        ConsoleColorUpdate.Write($"You are in the room at Row = {Player!.Position.Row + 1}, Column = {Player.Position.Column + 1}. Remaining arrows: ", ConsoleColor.White);
+        ConsoleColorUpdate.Write($"You are in the room at Row = {Player.Position.Row + 1}, Column = {Player.Position.Column + 1}. Remaining arrows: ", ConsoleColor.White);
         for (int i = Player.Arrows; i > 0; i--) { ConsoleColorUpdate.Write("↑", ConsoleColor.Yellow); }
         Console.WriteLine();        
         foreach (ISenses sense in Senses)
@@ -164,7 +164,7 @@ class Game
         }
     }
 
-    public Room CurrentRoom => Map.CurrentRoom(Player!.Position);
+    public Room CurrentRoom => Map.CurrentRoom(Player.Position);
     public bool Victory => CurrentRoom == Room.Start && FountainEnabled;
 }
 
@@ -200,7 +200,7 @@ class Maelstrom : Enemies
     public override void Action(Game game)  // Sends the player 2 spaces east and 1 north, while the maelstrom moves 2 spaces west and 1 south
     {
         ConsoleColorUpdate.WriteLine("You've run into a Maelstrom! It has sent you to another room!", ConsoleColor.Magenta);
-        game.Player!.Position = ClampToWall(new Position(game.Player.Position.Row + 1, game.Player.Position.Column + 2), game.Map.RowSize, game.Map.ColumnSize);
+        game.Player.Position = ClampToWall(new Position(game.Player.Position.Row + 1, game.Player.Position.Column + 2), game.Map.RowSize, game.Map.ColumnSize);
         Position = ClampToWall(new Position(Position.Row - 1, Position.Column - 2), game.Map.RowSize, game.Map.ColumnSize);
     }
 
@@ -223,7 +223,7 @@ class Amarok : Enemies
     public Amarok(Position position) : base(position) { }
     public override void Action(Game game)
     {
-        game.Player!.Death("You have been killed after encountering an Amarok.");
+        game.Player.Death("You have been killed after encountering an Amarok.");
     }
 }
 
@@ -274,7 +274,7 @@ class Movement : ICommands
 
     public void Run(Game game) 
     {
-        Position currentPosition = game.Player!.Position;
+        Position currentPosition = game.Player.Position;
         Position NewPosition = Direction switch
         {
             Direction.North => new Position(currentPosition.Row + 1, currentPosition.Column),
@@ -302,19 +302,19 @@ class Arrow : ICommands
     {
         bool enemyKilled = false;
         string enemyName = "";
-        if (game.Player!.Arrows > 0)
+        if (game.Player.Arrows > 0)
         {
-            game.Player!.Arrows--;
+            game.Player.Arrows--;
             ConsoleColorUpdate.Write($"You fire your bow to the {Direction}! ", ConsoleColor.Green);
             foreach (Enemies enemy in game.Enemies)
             {
-                if (Direction == Direction.North && (enemy.Position.Row - game.Player!.Position.Row) == 1 && enemy.Position.Column == game.Player!.Position.Column && !enemy.IsDead)
+                if (Direction == Direction.North && (enemy.Position.Row - game.Player.Position.Row) == 1 && enemy.Position.Column == game.Player.Position.Column && !enemy.IsDead)
                     { enemy.IsDead = true; enemyKilled = true; enemyName = enemy.ToString(); }
-                else if (Direction == Direction.South && (enemy.Position.Row - game.Player!.Position.Row) == -1 && enemy.Position.Column == game.Player!.Position.Column && !enemy.IsDead)
+                else if (Direction == Direction.South && (enemy.Position.Row - game.Player.Position.Row) == -1 && enemy.Position.Column == game.Player.Position.Column && !enemy.IsDead)
                     { enemy.IsDead = true; enemyKilled = true; enemyName = enemy.ToString(); }
-                else if (Direction == Direction.East && enemy.Position.Row == game.Player!.Position.Row && (enemy.Position.Column - game.Player.Position.Column) == 1 && !enemy.IsDead)
+                else if (Direction == Direction.East && enemy.Position.Row == game.Player.Position.Row && (enemy.Position.Column - game.Player.Position.Column) == 1 && !enemy.IsDead)
                     { enemy.IsDead = true; enemyKilled = true; enemyName = enemy.ToString(); }
-                else if (Direction == Direction.East && enemy.Position.Row == game.Player!.Position.Row && (enemy.Position.Column - game.Player.Position.Column) == -1 && !enemy.IsDead)
+                else if (Direction == Direction.East && enemy.Position.Row == game.Player.Position.Row && (enemy.Position.Column - game.Player.Position.Column) == -1 && !enemy.IsDead)
                     { enemy.IsDead = true; enemyKilled = true; enemyName = enemy.ToString(); }
             }
             if (enemyKilled == true) ConsoleColorUpdate.Write($"You hear the cry of a dying {enemyName}! Well done!", ConsoleColor.Green);
@@ -328,7 +328,7 @@ class EnableFountain : ICommands
 {
     public void Run(Game game)
     {
-        if (game.Map.CurrentRoom(game.Player!.Position) == Room.Fountain) game.FountainEnabled = true;
+        if (game.Map.CurrentRoom(game.Player.Position) == Room.Fountain) game.FountainEnabled = true;
         else
         {
             ConsoleColorUpdate.WriteLine("The fountain isn't in this room, nothing has happened.", ConsoleColor.Red);
@@ -355,7 +355,7 @@ interface ISenses
 
 class LightSense : ISenses
 {
-    public bool CanSense(Game game) => game.Map.CurrentRoom(game.Player!.Position) == Room.Start;
+    public bool CanSense(Game game) => game.Map.CurrentRoom(game.Player.Position) == Room.Start;
     public void DisplaySense(Game game)
     {
         ConsoleColorUpdate.WriteLine("You can see light in this room! You must be at the entrance.", ConsoleColor.Yellow);
@@ -364,7 +364,7 @@ class LightSense : ISenses
 
 class FountainSense : ISenses
 {
-    public bool CanSense(Game game) => game.Map.CurrentRoom(game.Player!.Position) == Room.Fountain;
+    public bool CanSense(Game game) => game.Map.CurrentRoom(game.Player.Position) == Room.Fountain;
     public void DisplaySense(Game game)
     {
         if (game.FountainEnabled) ConsoleColorUpdate.WriteLine("You hear rushing waters from the fountain! It has been reactivated!", ConsoleColor.Blue);
@@ -374,7 +374,7 @@ class FountainSense : ISenses
 
 class PitSense : ISenses
 {
-    public bool CanSense(Game game) => game.Map.NeighborCheck(game.Player!.Position, Room.Pit);
+    public bool CanSense(Game game) => game.Map.NeighborCheck(game.Player.Position, Room.Pit);
     public void DisplaySense(Game game) => ConsoleColorUpdate.WriteLine("You feel a draft. There is a pit in a nearby room.", ConsoleColor.DarkYellow); 
 }
 
@@ -386,8 +386,8 @@ class MaelstromSense : ISenses
         {
             if (enemy is Maelstrom && !enemy.IsDead)
             {
-                int rowDiff = Math.Abs(enemy.Position.Row - game.Player!.Position.Row);
-                int colDiff = Math.Abs(enemy.Position.Column - game.Player!.Position.Column);
+                int rowDiff = Math.Abs(enemy.Position.Row - game.Player.Position.Row);
+                int colDiff = Math.Abs(enemy.Position.Column - game.Player.Position.Column);
 
                 if (rowDiff <= 1 && colDiff <= 1) return true;
             }
@@ -405,8 +405,8 @@ class AmarokSense : ISenses
         {
             if (enemy is Amarok && !enemy.IsDead)
             {
-                int rowDiff = Math.Abs(enemy.Position.Row - game.Player!.Position.Row);
-                int colDiff = Math.Abs(enemy.Position.Column - game.Player!.Position.Column);
+                int rowDiff = Math.Abs(enemy.Position.Row - game.Player.Position.Row);
+                int colDiff = Math.Abs(enemy.Position.Column - game.Player.Position.Column);
 
                 if (rowDiff <= 1 && colDiff <= 1) return true;
             }
